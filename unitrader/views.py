@@ -119,3 +119,4 @@ def sell_item(request):
 def buy_items(request):
     available_items = Item.objects.filter(status='available')  # Only display available items
     return render(request, 'unitrader/buy_items.html', {'items': available_items})
+

@@ -10,8 +10,13 @@
     <label for="item_description">Item Description:</label>
     <textarea id="item_description" name="item_description"></textarea>
     
-    <label for="item_tags">Tags (comma-separated):</label>
-    <input type="text" id="item_tags" name="item_tags">
+    <label for="item_tags">Tags:</label>
+<select id="item_tags" name="item_tags" required>
+    <option value="" disabled selected>Select a tag</option>  <!-- Placeholder option -->
+    <option value="auction">Auction</option>
+    <option value="lbin">LBin</option>
+</select>
+
     
     <label for="item_age">Item Age (in years):</label>
     <input type="number" id="item_age" name="item_age">
