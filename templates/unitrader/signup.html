@@ -1,0 +1,11 @@
+{% extends "unitrader/base.html" %}
+
+{% block content %}
+<h2>Sign Up</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ user_form.as_p }}  <!-- User form fields -->
+    {{ profile_form.as_p }}  <!-- Profile form fields -->
+    <button type="submit">Sign Up</button>
+</form>
+{% endblock %}
