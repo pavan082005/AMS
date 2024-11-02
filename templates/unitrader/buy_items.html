@@ -1,0 +1,35 @@
+{% extends "unitrader/base.html" %}
+
+{% block content %}
+<h2>Available Items</h2>
+{% if items %}
+    <ul>
+    {% for item in items %}
+        <li style="margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; list-style-type: none;">
+            <h3>{{ item.item_title }}</h3>
+
+            {% if item.item_image %}
+                <img src="{{ item.item_image.url }}" alt="{{ item.item_title }}" style="width: 200px; height: auto;">
+            {% endif %}
+
+            <p>{{ item.item_description }}</p>
+            <p>Price: ${{ item.base_price }}</p>
+            
+            {% if item.item_age %}
+                <p>Item Age: {{ item.item_age }} years</p>
+            {% endif %}
+            
+            <p>Quantity: {{ item.quantity }}</p>
+            
+            {% if item.item_tags %}
+                <p>Tags: {{ item.item_tags }}</p>
+            {% endif %}
+            
+            <a href="#" class="btn btn-primary">Buy Now</a>  <!-- Link to purchase item -->
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No items are available for purchase right now.</p>
+{% endif %}
+{% endblock %}

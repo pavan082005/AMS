@@ -2,9 +2,18 @@
 {% block content %}
 <h2>Welcome to UniTrader</h2>
 <p>This is the home page of UniTrader, your auction management platform.</p>
+
 {% if user.is_authenticated %}
     <p>Hello, {{ user.username }}! You can view your <a href="{% url 'profile' %}">profile</a>.</p>
+    
+    <!-- Sell and Buy buttons -->
+    <p>
+        <a href="{% url 'sell_item' %}" class="button">Sell Item</a> <!-- Button to sell item -->
+        <a href="{% url 'buy_items' %}" class="button">Buy Items</a> <!-- Button to buy items -->
+    </p>
+
 {% else %}
     <p>Please <a href="{% url 'signin' %}">sign in</a> or <a href="{% url 'signup' %}">sign up</a> to get started.</p>
 {% endif %}
+
 {% endblock %}

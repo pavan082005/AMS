@@ -1,0 +1,30 @@
+{% extends "unitrader/base.html" %}
+{% block content %}
+<h2>Sell an Item</h2>
+<form method="POST" enctype="multipart/form-data">  <!-- Important: enctype for file uploads -->
+    {% csrf_token %}
+    
+    <label for="item_title">Item Title:</label>
+    <input type="text" id="item_title" name="item_title" required>
+    
+    <label for="item_description">Item Description:</label>
+    <textarea id="item_description" name="item_description"></textarea>
+    
+    <label for="item_tags">Tags (comma-separated):</label>
+    <input type="text" id="item_tags" name="item_tags">
+    
+    <label for="item_age">Item Age (in years):</label>
+    <input type="number" id="item_age" name="item_age">
+    
+    <label for="base_price">Base Price:</label>
+    <input type="number" step="0.01" id="base_price" name="base_price" required>
+    
+    <label for="quantity">Quantity:</label>
+    <input type="number" id="quantity" name="quantity" value="1" min="1">
+
+    <label for="item_image">Upload Item Image:</label>
+    <input type="file" id="item_image" name="item_image" accept="image/*">  <!-- File input for image -->
+    
+    <button type="submit">Sell Item</button>
+</form>
+{% endblock %}

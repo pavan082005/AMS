@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
-from .models import Profile
+from .models import Item, Profile
 
 def home(request):
     """Render the home page."""
@@ -85,3 +85,37 @@ def custom_logout(request):
     logout(request)  # Log out the user
     messages.success(request, 'You have been logged out.')
     return redirect('signin')  # Redirect to the sign-in page after logout
+
+def sell_item(request):
+    if request.method == "POST":
+        item_title = request.POST.get('item_title')
+        item_description = request.POST.get('item_description')
+        item_tags = request.POST.get('item_tags')
+        item_age = request.POST.get('item_age')
+        base_price = request.POST.get('base_price')
+        quantity = request.POST.get('quantity')
+        item_image = request.FILES.get('item_image')  # Access uploaded image
+
+        # Create a new item instance
+        item = Item(
+            item_title=item_title,
+            item_description=item_description,
+            item_tags=item_tags,
+            item_age=item_age,
+            base_price=base_price,
+            quantity=quantity,
+            item_image=item_image,  # Save the uploaded image
+            seller=request.user  # Associate with the logged-in user
+        )
+        item.save()  # Save the new item to the database
+
+        # Redirect to the item list (buy_items) view
+        return redirect('buy_items')
+
+    return render(request, 'unitrader/sell_item.html')
+
+
+
+def buy_items(request):
+    available_items = Item.objects.filter(status='available')  # Only display available items
+    return render(request, 'unitrader/buy_items.html', {'items': available_items})
