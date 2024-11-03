@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -120,3 +120,80 @@ def buy_items(request):
     available_items = Item.objects.filter(status='available')  # Only display available items
     return render(request, 'unitrader/buy_items.html', {'items': available_items})
 
+@login_required
+def buy_now(request, item_id):
+    """Handle the 'Buy Now' option for LBin items."""
+    item = get_object_or_404(Item, id=item_id)
+
+    if item.item_tags != 'lbin' and item.status == 'available':
+        # Render the confirmation page with item details
+        context = {
+            'item': item
+        }
+        return render(request, 'unitrader/confirm_purchase.html', context)
+
+    return redirect('buy_items')
+
+
+@login_required
+def bid_on_item(request, item_id):
+    """Handle placing a bid on an auction item."""
+    item = get_object_or_404(Item, id=item_id)
+
+    if request.method == "POST":
+        bid_amount = request.POST.get('bid_amount')
+
+        if bid_amount and float(bid_amount) > item.highest_bid:
+            item.highest_bid = float(bid_amount)
+            item.highest_bidder = request.user  
+            item.save()
+            messages.success(request, "Your bid has been placed successfully!")
+        else:
+            messages.error(request, "Your bid must be higher than the current highest bid.")
+
+    return redirect('buy_items')  
+
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Message
+from .forms import MessageForm
+from django.contrib.auth.models import User
+from django.db.models import Q
+
+@login_required
+def chat_with_seller(request, seller_id):  # Make sure seller_id is included here
+    seller = get_object_or_404(User, id=seller_id)
+    
+    # Retrieve messages between the buyer and the seller
+    messages = Message.objects.filter(
+        (Q(sender=request.user) & Q(recipient=seller)) |
+        (Q(sender=seller) & Q(recipient=request.user))
+    ).order_by('timestamp')
+
+    if request.method == "POST":
+        content = request.POST.get('message')
+        if content:
+            Message.objects.create(
+                sender=request.user,
+                recipient=seller,
+                content=content
+            )
+            return redirect('chat_with_seller', seller_id=seller.id)  # Redirecting to the same view
+
+    return render(request, 'unitrader/chat.html', {
+        'seller': seller,
+        'messages': messages
+    })
+
+def inbox(request):
+    # Retrieve all messages for the logged-in user
+    messages = Message.objects.filter(recipient=request.user).order_by('-timestamp')
+
+    for message in messages:
+        message.is_read = True  # Mark message as read
+        message.save()
+
+    return render(request, 'unitrader/inbox.html', {
+        'messages': messages,
+    })

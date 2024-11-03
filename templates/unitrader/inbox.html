@@ -1,0 +1,24 @@
+<!-- templates/unitrader/inbox.html -->
+{% extends "unitrader/base.html" %}
+{% block content %}
+<h2>Your Inbox</h2>
+
+{% if messages %}
+    <ul>
+    {% for message in messages %}
+        <li>
+            <strong>From:</strong> {{ message.sender.username }} <br>
+            <strong>Message:</strong> {{ message.content }} <br>
+            <small>Sent at: {{ message.timestamp|date:"D M d H:i:s Y" }}</small>
+            <br>
+            <a href="{% url 'chat_with_seller' message.sender.id %}">Chat</a>  <!-- Link to chat -->
+            <hr>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no messages.</p>
+{% endif %}
+
+<a href="{% url 'buy_items' %}">Back to Items</a>
+{% endblock %}

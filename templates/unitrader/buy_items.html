@@ -1,31 +1,31 @@
 {% extends "unitrader/base.html" %}
-
 {% block content %}
 <h2>Available Items</h2>
 {% if items %}
     <ul>
     {% for item in items %}
-        <li style="margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; list-style-type: none;">
+        <li>
             <h3>{{ item.item_title }}</h3>
-
-            {% if item.item_image %}
-                <img src="{{ item.item_image.url }}" alt="{{ item.item_title }}" style="width: 200px; height: auto;">
-            {% endif %}
-
             <p>{{ item.item_description }}</p>
+            
+            <p>Tags: {{ item.item_tags }}</p>
+            
+            {% if item.item_tags|lower == "auction" %}
+            <p>Base Price: ${{ item.base_price }}</p>
+            <p>Highest Bid: ${{ item.highest_bid }}</p>
+                <form method="POST" action="{% url 'bid_on_item' item.id %}">
+                    {% csrf_token %}
+                    <input type="number" name="bid_amount" placeholder="Enter your bid" required>
+                    <button type="submit">Place Bid</button>
+                </form>
+            {% elif item.item_tags|lower != "auction" %}
             <p>Price: ${{ item.base_price }}</p>
-            
-            {% if item.item_age %}
-                <p>Item Age: {{ item.item_age }} years</p>
+
+                <form method="POST" action="{% url 'buy_now' item.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Buy Now</button>
+                </form>
             {% endif %}
-            
-            <p>Quantity: {{ item.quantity }}</p>
-            
-            {% if item.item_tags %}
-                <p>Tags: {{ item.item_tags }}</p>
-            {% endif %}
-            
-            <a href="#" class="btn btn-primary">Buy Now</a>  <!-- Link to purchase item -->
         </li>
     {% endfor %}
     </ul>

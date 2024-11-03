@@ -22,7 +22,6 @@ class Item(models.Model):
     item_age = models.IntegerField(null=True, blank=True)  # Age can be optional
     base_price = models.DecimalField(max_digits=10, decimal_places=2)
     
-    # Change item_images to ImageField to handle image uploads
     item_image = models.ImageField(upload_to='item_images/', blank=True, null=True)  # File upload field
     
     quantity = models.IntegerField(default=1)
@@ -38,5 +37,19 @@ class Item(models.Model):
         default='available'
     )
 
+    # New fields for bidding
+    highest_bid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    highest_bidder = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='highest_bidder')
+
     def __str__(self):
         return self.item_title
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
+    recipient = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)  # To track read/unread status
+
+    def __str__(self):
+        return f'Message from {self.sender.username} to {self.recipient.username}'

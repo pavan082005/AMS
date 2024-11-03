@@ -1,0 +1,20 @@
+{% extends "unitrader/base.html" %}
+{% block content %}
+<h2>Confirm Your Purchase</h2>
+
+<h3>Item Details:</h3>
+<p><strong>Title:</strong> {{ item.item_title }}</p>
+<p><strong>Description:</strong> {{ item.item_description }}</p>
+<p><strong>Tags:</strong> {{ item.item_tags }}</p>
+<p><strong>Price:</strong> ${{ item.base_price }}</p>
+<p><strong>Quantity Available:</strong> {{ item.quantity }}</p>
+
+<form method="POST" action="#">
+    {% csrf_token %}
+    <button type="submit">Confirm Purchase</button>
+</form>
+<p>
+    <a href="{% url 'chat_with_seller' item.seller.id %}">Chat with the Seller</a>
+</p>
+<a href="{% url 'buy_items' %}">Cancel</a>
+{% endblock %}
