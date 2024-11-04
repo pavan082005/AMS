@@ -16,5 +16,11 @@
 {% else %}
     <p>Please <a href="{% url 'signin' %}">sign in</a> or <a href="{% url 'signup' %}">sign up</a> to get started.</p>
 {% endif %}
-
+<div id="purchase-message" style="font-size: 24px; color: green; margin-top: 20px;">
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+</div>
 {% endblock %}

@@ -197,3 +197,30 @@ def inbox(request):
     return render(request, 'unitrader/inbox.html', {
         'messages': messages,
     })
+    
+
+@login_required
+def confirm_purchase(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
+    profile = get_object_or_404(Profile, user=request.user)
+
+    if request.method == "POST":
+        # Check if the user has enough coins
+        if profile.coins >= item.base_price:
+            profile.coins -= item.base_price  # Deduct the item's price
+            item.quantity -= 1  # Reduce item quantity
+            
+            if item.quantity == 0:
+                item.status = 'sold'
+            
+            # Save the updated profiles and items
+            profile.save()
+            item.save()
+            
+            messages.success(request, "Purchase confirmed! Coins deducted.")
+            return redirect('buy_items')  # Redirect to buy_items or a success page
+        else:
+            messages.error(request, "You do not have enough coins to purchase this item.")
+            return redirect('confirm_purchase', item_id=item_id)
+
+    return render(request, 'unitrader/confirm_purchase.html', {'item': item})

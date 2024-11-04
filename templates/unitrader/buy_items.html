@@ -11,15 +11,15 @@
             <p>Tags: {{ item.item_tags }}</p>
             
             {% if item.item_tags|lower == "auction" %}
-            <p>Base Price: ${{ item.base_price }}</p>
-            <p>Highest Bid: ${{ item.highest_bid }}</p>
+            <p>Base Price: {{ item.base_price  }}(coins)</p>
+            <p>Highest Bid: {{ item.highest_bid }}</p>
                 <form method="POST" action="{% url 'bid_on_item' item.id %}">
                     {% csrf_token %}
                     <input type="number" name="bid_amount" placeholder="Enter your bid" required>
                     <button type="submit">Place Bid</button>
                 </form>
             {% elif item.item_tags|lower != "auction" %}
-            <p>Price: ${{ item.base_price }}</p>
+            <p>Price: {{ item.base_price }}(coins)</p>
 
                 <form method="POST" action="{% url 'buy_now' item.id %}">
                     {% csrf_token %}
@@ -32,4 +32,11 @@
 {% else %}
     <p>No items are available for purchase right now.</p>
 {% endif %}
+<div id="purchase-message" style="font-size: 24px; color: green; margin-top: 20px;">
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+</div>
 {% endblock %}

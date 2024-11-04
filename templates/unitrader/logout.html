@@ -2,4 +2,11 @@
 {% block content %}
 <h2>You have been logged out.</h2>
 <p><a href="{% url 'signin' %}">Sign in</a> again or <a href="{% url 'home' %}">go to the home page</a>.</p>
+<div id="purchase-message" style="font-size: 24px; color: green; margin-top: 20px;">
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+</div>
 {% endblock %}

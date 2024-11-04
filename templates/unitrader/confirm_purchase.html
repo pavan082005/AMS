@@ -1,4 +1,5 @@
 {% extends "unitrader/base.html" %}
+
 {% block content %}
 <h2>Confirm Your Purchase</h2>
 
@@ -9,12 +10,22 @@
 <p><strong>Price:</strong> ${{ item.base_price }}</p>
 <p><strong>Quantity Available:</strong> {{ item.quantity }}</p>
 
-<form method="POST" action="#">
+<form method="POST" action="{% url 'confirm_purchase' item.id %}">
     {% csrf_token %}
     <button type="submit">Confirm Purchase</button>
 </form>
+
 <p>
     <a href="{% url 'chat_with_seller' item.seller.id %}">Chat with the Seller</a>
 </p>
 <a href="{% url 'buy_items' %}">Cancel</a>
+
+<div id="purchase-message" style="font-size: 24px; color: green; margin-top: 20px;">
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+</div>
+
 {% endblock %}

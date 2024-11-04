@@ -1,0 +1,16 @@
+{% extends "unitrader/base.html" %}
+{% block content %}
+<h2>Purchase Unsuccessful</h2>
+
+<p>Unfortunately, you do not have enough coins to purchase this item.</p>
+
+<h3>Item Details:</h3>
+<p><strong>Title:</strong> {{ item.item_title }}</p>
+<p><strong>Description:</strong> {{ item.item_description }}</p>
+<p><strong>Price:</strong> ${{ item.base_price }}</p>
+
+<p>Coins required: ${{ item.base_price }}</p>
+<p>Your available coins: {{ profile.coins }}</p>
+
+<a href="{% url 'buy_items' %}">Go back to available items</a>
+{% endblock %}
