@@ -116,9 +116,23 @@ def sell_item(request):
 
 
 
+
 def buy_items(request):
-    available_items = Item.objects.filter(status='available')  # Only display available items
-    return render(request, 'unitrader/buy_items.html', {'items': available_items})
+    # Get the tag filter from the GET request
+    selected_tag = request.GET.get('tag', '')
+
+    # Filter available items based on the selected tag
+    if selected_tag.lower() == 'auction':
+        available_items = Item.objects.filter(status='available', item_tags__iexact='auction')
+    elif selected_tag.lower() == 'lbin':
+        available_items = Item.objects.filter(status='available', item_tags__iexact='lbin')
+    else:
+        available_items = Item.objects.filter(status='available')  # No filter applied
+
+    return render(request, 'unitrader/buy_items.html', {
+        'items': available_items,
+        'selected_tag': selected_tag,  # Pass the selected tag to the template
+    })
 
 @login_required
 def buy_now(request, item_id):
