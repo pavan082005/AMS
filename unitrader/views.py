@@ -258,3 +258,19 @@ def confirm_purchase(request, item_id):
             return redirect('confirm_purchase', item_id=item_id)
 
     return render(request, 'unitrader/confirm_purchase.html', {'item': item})
+
+@login_required
+def buy_coins(request):
+    if request.method == "POST":
+        coins_to_purchase = int(request.POST.get('coins'))
+        cost = coins_to_purchase * 10  # Set your price per coin here
+        profile = request.user.profile
+
+        if profile.coins >= cost:
+            profile.coins -= cost
+            profile.save()
+            messages.success(request, f"You have purchased {coins_to_purchase} coins!")
+        else:
+            messages.error(request, "You do not have enough coins to purchase more.")
+
+    return render(request, 'unitrader/buy_coins.html')

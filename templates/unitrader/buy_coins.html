@@ -1,0 +1,17 @@
+{% extends "unitrader/base.html" %}
+{% block content %}
+<h2>Buy Coins</h2>
+<form method="POST">
+    {% csrf_token %}
+    <label for="coins">Enter the number of coins you want to purchase:</label>
+    <input type="number" name="coins" id="coins" min="1" required>
+    <button type="submit">Purchase</button>
+</form>
+<div id="purchase-message" style="font-size: 24px; color: green; margin-top: 20px;">
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

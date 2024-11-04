@@ -6,11 +6,12 @@
 {% if user.is_authenticated %}
     <p>Hello, {{ user.username }}! You can view your <a href="{% url 'profile' %}">profile</a>.</p>
     
-    <!-- Sell and Buy buttons -->
+    <!-- Sell, Buy, and Buy Coins buttons -->
     <p>
         <a href="{% url 'sell_item' %}" class="button">Sell Item</a> <!-- Button to sell item -->
         <a href="{% url 'buy_items' %}" class="button">Buy Items</a> <!-- Button to buy items -->
         <a href="{% url 'inbox' %}" class="button">Inbox</a> <!-- Button to view inbox -->
+        <a href="{% url 'buy_coins' %}" class="button">Buy More Coins</a> <!-- Button to buy more coins -->
     </p>
 
 {% else %}
