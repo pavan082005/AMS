@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
-from .models import Item, Profile
+from .models import Bid, Item, Profile
 
 def home(request):
     """Render the home page."""
@@ -135,23 +135,57 @@ def buy_now(request, item_id):
     return redirect('buy_items')
 
 
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from .models import Item, Profile
+
+
+
+from decimal import Decimal  # Importing Decimal
+
 @login_required
 def bid_on_item(request, item_id):
     """Handle placing a bid on an auction item."""
     item = get_object_or_404(Item, id=item_id)
+    profile = request.user.profile
 
     if request.method == "POST":
         bid_amount = request.POST.get('bid_amount')
 
-        if bid_amount and float(bid_amount) > item.highest_bid:
-            item.highest_bid = float(bid_amount)
-            item.highest_bidder = request.user  
-            item.save()
-            messages.success(request, "Your bid has been placed successfully!")
-        else:
-            messages.error(request, "Your bid must be higher than the current highest bid.")
+        if bid_amount:
+            bid_amount = Decimal(bid_amount)  # Convert to Decimal
+            
+            
+            if profile.coins >= bid_amount:
+                if item.highest_bidder:
+                    previous_highest_bidder_profile = item.highest_bidder.profile
+                    previous_highest_bidder_profile.coins += item.highest_bid
+                    previous_highest_bidder_profile.save()
 
-    return redirect('buy_items')  
+                    item.highest_bid += bid_amount
+
+                    profile.coins -= bid_amount
+                    profile.save()
+
+                    item.highest_bidder = request.user
+                    item.save()
+
+                    Bid.objects.create(user=request.user, item=item, amount=bid_amount)
+                    messages.success(request, "Your bid has been placed successfully!")
+                else:
+                    messages.error(request, "You do not have enough coins to place this bid.")
+            
+
+    return redirect('buy_items')
+
+
+def finalize_auctions(request):
+    """Finalizes all auctions that have ended."""
+    items = Item.objects.all()
+    for item in items:
+        item.finalize_auction()
+    return redirect('buy_items')
 
 # views.py
 from django.shortcuts import render, redirect, get_object_or_404
@@ -162,7 +196,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 
 @login_required
-def chat_with_seller(request, seller_id):  # Make sure seller_id is included here
+def chat_with_seller(request, seller_id):  
     seller = get_object_or_404(User, id=seller_id)
     
     # Retrieve messages between the buyer and the seller

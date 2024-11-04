@@ -15,4 +15,6 @@ urlpatterns = [
     path('chat/seller/<int:seller_id>/', views.chat_with_seller, name='chat_with_seller'),
     path('inbox/', views.inbox, name='inbox'),
     path('confirm-purchase/<int:item_id>/', views.confirm_purchase, name='confirm_purchase'),
+    #path('bid/<int:item_id>/', views.bid_on_item, name='bid_on_item'),
+    path('finalize-auctions/', views.finalize_auctions, name='finalize_auctions')
 ]
