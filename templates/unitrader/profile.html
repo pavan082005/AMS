@@ -5,8 +5,24 @@
 <p><strong>Username:</strong> {{ user.username }}</p>
 <p><strong>Roll Number:</strong> {{ profile.roll_number }}</p>
 <p><strong>Date of Birth:</strong> {{ profile.date_of_birth }}</p>
-<p><strong>Date Joined:</strong> {{ profile.date_joined}}</p>
+<p><strong>Date Joined:</strong> {{ profile.date_joined }}</p>
 <p><strong>Phone Number:</strong> {{ profile.ph_number }}</p>
 <p><strong>Coins remaining:</strong> {{ profile.coins }}</p>
+
+{% if profile.profile_picture %}
+    <p><strong>Profile picture:</strong></p>
+    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" style="max-width: 150px; max-height: 150px;">
+{% else %}
+    <p>No profile picture uploaded.</p>
+{% endif %}
+
+<!-- Profile Picture Upload Form -->
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="profile_picture">Upload Profile Picture:</label>
+    <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+    <button type="submit">Upload</button>
+</form>
+
 <p><a href="{% url 'edit_profile' %}">Edit Profile</a></p>
 {% endblock %}

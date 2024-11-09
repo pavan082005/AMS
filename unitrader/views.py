@@ -49,27 +49,32 @@ def signin(request):
 
 @login_required
 def profile(request):
-    """Display user profile."""
-    profile = request.user.profile  # Fetch the profile associated with the logged-in user
-    context = {
-        'profile': profile,
-    }
-    return render(request, 'unitrader/profile.html', context)
+    """Display user profile and allow uploading a profile picture."""
+    profile = request.user.profile  # Get the user's profile
+    
+    if request.method == 'POST' and request.FILES.get('profile_picture'):
+        # Handle the profile picture upload
+        profile.profile_picture = request.FILES['profile_picture']
+        profile.save()
+        messages.success(request, 'Your profile picture has been updated!')
+        return redirect('profile')  # Redirect to the profile page after saving the image
+
+    return render(request, 'unitrader/profile.html', {'profile': profile})
 
 
 @login_required
 def edit_profile(request):
-    """Allow user to edit their profile."""
+    """Allow user to edit their profile, including uploading a profile picture."""
     user_form = UserUpdateForm(instance=request.user)
     profile_form = ProfileUpdateForm(instance=request.user.profile)
 
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = ProfileUpdateForm(request.POST, instance=request.user.profile)
+        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)  # Handling files
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()  # Save the user data
-            profile_form.save()  # Save the profile data
+            profile_form.save()  # Save the profile data, including the profile picture
             messages.success(request, 'Your profile has been updated!')
             return redirect('profile')  # Redirect to the profile page after saving changes
 
@@ -78,6 +83,7 @@ def edit_profile(request):
         'profile_form': profile_form
     }
     return render(request, 'unitrader/edit_profile.html', context)
+
 
 
 def custom_logout(request):
@@ -136,17 +142,18 @@ def buy_items(request):
 
 @login_required
 def buy_now(request, item_id):
-    """Handle the 'Buy Now' option for LBin items."""
+    print("Buy Now triggered")
     item = get_object_or_404(Item, id=item_id)
 
-    if item.item_tags != 'lbin' and item.status == 'available':
-        # Render the confirmation page with item details
+    if item.item_tags == 'lbin' and item.status == 'available':
+        print(f"Processing purchase for item: {item.item_title}")
         context = {
             'item': item
         }
         return render(request, 'unitrader/confirm_purchase.html', context)
 
     return redirect('buy_items')
+
 
 
 from django.contrib.auth.decorators import login_required

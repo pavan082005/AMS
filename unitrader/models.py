@@ -11,6 +11,7 @@ class Profile(models.Model):
     date_joined = models.DateField(auto_now_add=True)
     ph_number = models.CharField(max_length=15)
     coins = models.IntegerField(default=500)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)  
 
     def __str__(self):
         return self.user.username

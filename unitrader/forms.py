@@ -13,8 +13,7 @@ class UserRegisterForm(UserCreationForm):
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['roll_number', 'date_of_birth', 'age', 'ph_number']
-
+        fields = ['roll_number', 'date_of_birth', 'age', 'ph_number'] 
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User

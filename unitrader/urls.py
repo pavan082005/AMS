@@ -1,4 +1,6 @@
 from django.urls import path
+
+from auctionmanagement import settings
 from . import views
 
 urlpatterns = [
