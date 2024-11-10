@@ -6,17 +6,19 @@
 {% if user.is_authenticated %}
     <p>Hello, {{ user.username }}! You can view your <a href="{% url 'profile' %}">profile</a>.</p>
     
-    <!-- Sell, Buy, and Buy Coins buttons -->
+    <!-- Sell, Buy, Inbox, Buy Coins, Seller's History, and Buyer's History buttons -->
     <p>
         <a href="{% url 'sell_item' %}" class="button">Sell Item</a> <!-- Button to sell item -->
         <a href="{% url 'buy_items' %}" class="button">Buy Items</a> <!-- Button to buy items -->
         <a href="{% url 'inbox' %}" class="button">Inbox</a> <!-- Button to view inbox -->
         <a href="{% url 'buy_coins' %}" class="button">Buy More Coins</a> <!-- Button to buy more coins -->
+        <a href="{% url 'seller_history' %}" class="button">Seller's History</a> <!-- Button to view seller's history -->
     </p>
 
 {% else %}
     <p>Please <a href="{% url 'signin' %}">sign in</a> or <a href="{% url 'signup' %}">sign up</a> to get started.</p>
 {% endif %}
+
 <div id="purchase-message" style="font-size: 24px; color: green; margin-top: 20px;">
     {% if messages %}
         {% for message in messages %}

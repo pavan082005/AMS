@@ -1,0 +1,75 @@
+{% extends "unitrader/base.html" %}
+
+{% block content %}
+<h2>Seller's History</h2>
+
+<h3>LBin (Buy Now) Items</h3>
+{% if sold_lbin_items or available_lbin_items %}
+    <ul>
+        {% for item in available_lbin_items %}
+            <li>
+                <h4>{{ item.item_title }}</h4>
+                <p><strong>Description:</strong> {{ item.item_description }}</p>
+                <p><strong>Selling for:</strong> ${{ item.base_price }}</p>
+                
+                {% if item.item_image %}
+                    <img src="{{ item.item_image.url }}" alt="{{ item.item_title }}" style="max-width: 150px;">
+                {% endif %}
+            </li>
+            <hr>
+        {% endfor %}
+
+        {% for item in sold_lbin_items %}
+            <li>
+                <h4>{{ item.item_title }}</h4>
+                <p><strong>Description:</strong> {{ item.item_description }}</p>
+                <p><strong>Sold for:</strong> ${{ item.base_price }}</p>
+                <p><strong>Sold on:</strong> {{ item.updated_at }}</p>
+                
+                {% if item.item_image %}
+                    <img src="{{ item.item_image.url }}" alt="{{ item.item_title }}" style="max-width: 150px;">
+                {% endif %}
+            </li>
+            <hr>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No LBin items available or sold yet.</p>
+{% endif %}
+
+<h3>Auction Items</h3>
+{% if sold_auction_items or available_auction_items %}
+    <ul>
+        {% for item in available_auction_items %}
+            <li>
+                <h4>{{ item.item_title }}</h4>
+                <p><strong>Description:</strong> {{ item.item_description }}</p>
+                <p><strong>Starting Bid:</strong> ${{ item.base_price }}</p>
+                
+                {% if item.item_image %}
+                    <img src="{{ item.item_image.url }}" alt="{{ item.item_title }}" style="max-width: 150px;">
+                {% endif %}
+            </li>
+            <hr>
+        {% endfor %}
+
+        {% for item in sold_auction_items %}
+            <li>
+                <h4>{{ item.item_title }}</h4>
+                <p><strong>Description:</strong> {{ item.item_description }}</p>
+                <p><strong>Sold for:</strong> ${{ item.highest_bid }}</p>
+                <p><strong>Sold on:</strong> {{ item.updated_at }}</p>
+                
+                {% if item.item_image %}
+                    <img src="{{ item.item_image.url }}" alt="{{ item.item_title }}" style="max-width: 150px;">
+                {% endif %}
+            </li>
+            <hr>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No Auction items available or sold yet.</p>
+{% endif %}
+
+<a href="{% url 'sell_item' %}">Sell a new item</a>
+{% endblock %}

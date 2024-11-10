@@ -295,3 +295,34 @@ def buy_coins(request):
             messages.error(request, "You do not have enough coins to purchase more.")
 
     return render(request, 'unitrader/buy_coins.html')
+
+@login_required
+def seller_history(request):
+    """Display all items sold and available by the logged-in user, categorized by LBin and Auction."""
+    available_lbin_items = Item.objects.filter(seller=request.user, status='available', item_tags__iexact='lbin')
+    sold_lbin_items = Item.objects.filter(seller=request.user, status='sold', item_tags__iexact='lbin')
+
+    available_auction_items = Item.objects.filter(seller=request.user, status='available', item_tags__iexact='auction')
+    sold_auction_items = Item.objects.filter(seller=request.user, status='sold', item_tags__iexact='auction')
+
+    context = {
+        'available_lbin_items': available_lbin_items,
+        'sold_lbin_items': sold_lbin_items,
+        'available_auction_items': available_auction_items,
+        'sold_auction_items': sold_auction_items,
+    }
+    
+    return render(request, 'unitrader/seller_history.html', context)
+
+@login_required
+def buyer_history(request):
+    # Get items where the user was the highest bidder (auction) or bought through LBin
+    bought_auction_items = Item.objects.filter(highest_bidder=request.user, status='sold')
+    bought_lbin_items = Item.objects.filter(seller=request.user, status='sold', highest_bidder=request.user)
+
+    context = {
+        'bought_auction_items': bought_auction_items,
+        'bought_lbin_items': bought_lbin_items,
+    }
+    
+    return render(request, 'unitrader/buyer_history.html', context)

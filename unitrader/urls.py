@@ -19,5 +19,7 @@ urlpatterns = [
     path('confirm-purchase/<int:item_id>/', views.confirm_purchase, name='confirm_purchase'),
     #path('bid/<int:item_id>/', views.bid_on_item, name='bid_on_item'),
     path('finalize-auctions/', views.finalize_auctions, name='finalize_auctions'),
-    path('buy_coins/', views.buy_coins, name='buy_coins'),  # URL for buying coins
+    path('buy_coins/', views.buy_coins, name='buy_coins'),  
+    path('seller_history/', views.seller_history, name='seller_history'),
+
 ]
