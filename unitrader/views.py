@@ -5,61 +5,66 @@ from django.contrib import messages
 from .forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
 from .models import Bid, Item, Profile
 
+
 def home(request):
     """Render the home page."""
-    return render(request, 'unitrader/home.html')
+    return render(request, "unitrader/home.html")
+
 
 def signup(request):
     """Handle user signup."""
     user_form = UserRegisterForm()
     profile_form = ProfileUpdateForm()
-    
-    if request.method == 'POST':
+
+    if request.method == "POST":
         user_form = UserRegisterForm(request.POST)
         profile_form = ProfileUpdateForm(request.POST)
-        
+
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save()  # Save the user data
-            Profile.objects.create(user=user, **profile_form.cleaned_data)  # Create the profile
-            username = user_form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}')
-            return redirect('signin')  # Redirect to signin after successful signup
-    
-    context = {
-        'user_form': user_form,
-        'profile_form': profile_form
-    }
-    return render(request, 'unitrader/signup.html', context)
+            Profile.objects.create(
+                user=user, **profile_form.cleaned_data
+            )  # Create the profile
+            username = user_form.cleaned_data.get("username")
+            messages.success(request, f"Account created for {username}")
+            return redirect("signin")  # Redirect to signin after successful signup
+
+    context = {"user_form": user_form, "profile_form": profile_form}
+    return render(request, "unitrader/signup.html", context)
+
 
 def signin(request):
     """Handle user sign in."""
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-        
+
         if user is not None:
             login(request, user)
-            messages.success(request, 'You have successfully logged in.')
-            return redirect('home')  # Redirect to home page after sign in
+            messages.success(request, "You have successfully logged in.")
+            return redirect("home")  # Redirect to home page after sign in
         else:
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, "Invalid username or password.")
 
-    return render(request, 'unitrader/signin.html')
+    return render(request, "unitrader/signin.html")
+
 
 @login_required
 def profile(request):
     """Display user profile and allow uploading a profile picture."""
     profile = request.user.profile  # Get the user's profile
-    
-    if request.method == 'POST' and request.FILES.get('profile_picture'):
-        # Handle the profile picture upload
-        profile.profile_picture = request.FILES['profile_picture']
-        profile.save()
-        messages.success(request, 'Your profile picture has been updated!')
-        return redirect('profile')  # Redirect to the profile page after saving the image
 
-    return render(request, 'unitrader/profile.html', {'profile': profile})
+    if request.method == "POST" and request.FILES.get("profile_picture"):
+        # Handle the profile picture upload
+        profile.profile_picture = request.FILES["profile_picture"]
+        profile.save()
+        messages.success(request, "Your profile picture has been updated!")
+        return redirect(
+            "profile"
+        )  # Redirect to the profile page after saving the image
+
+    return render(request, "unitrader/profile.html", {"profile": profile})
 
 
 @login_required
@@ -68,39 +73,40 @@ def edit_profile(request):
     user_form = UserUpdateForm(instance=request.user)
     profile_form = ProfileUpdateForm(instance=request.user.profile)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)  # Handling files
+        profile_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=request.user.profile
+        )  # Handling files
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()  # Save the user data
             profile_form.save()  # Save the profile data, including the profile picture
-            messages.success(request, 'Your profile has been updated!')
-            return redirect('profile')  # Redirect to the profile page after saving changes
+            messages.success(request, "Your profile has been updated!")
+            return redirect(
+                "profile"
+            )  # Redirect to the profile page after saving changes
 
-    context = {
-        'user_form': user_form,
-        'profile_form': profile_form
-    }
-    return render(request, 'unitrader/edit_profile.html', context)
-
+    context = {"user_form": user_form, "profile_form": profile_form}
+    return render(request, "unitrader/edit_profile.html", context)
 
 
 def custom_logout(request):
     """Log out the user."""
     logout(request)  # Log out the user
-    messages.success(request, 'You have been logged out.')
-    return redirect('signin')  # Redirect to the sign-in page after logout
+    messages.success(request, "You have been logged out.")
+    return redirect("signin")  # Redirect to the sign-in page after logout
+
 
 def sell_item(request):
     if request.method == "POST":
-        item_title = request.POST.get('item_title')
-        item_description = request.POST.get('item_description')
-        item_tags = request.POST.get('item_tags')
-        item_age = request.POST.get('item_age')
-        base_price = request.POST.get('base_price')
-        quantity = request.POST.get('quantity')
-        item_image = request.FILES.get('item_image')  # Access uploaded image
+        item_title = request.POST.get("item_title")
+        item_description = request.POST.get("item_description")
+        item_tags = request.POST.get("item_tags")
+        item_age = request.POST.get("item_age")
+        base_price = request.POST.get("base_price")
+        quantity = request.POST.get("quantity")
+        item_image = request.FILES.get("item_image")  # Access uploaded image
 
         # Create a new item instance
         item = Item(
@@ -111,49 +117,53 @@ def sell_item(request):
             base_price=base_price,
             quantity=quantity,
             item_image=item_image,  # Save the uploaded image
-            seller=request.user  # Associate with the logged-in user
+            seller=request.user,  # Associate with the logged-in user
         )
         item.save()  # Save the new item to the database
 
         # Redirect to the item list (buy_items) view
-        return redirect('buy_items')
+        return redirect("buy_items")
 
-    return render(request, 'unitrader/sell_item.html')
-
-
+    return render(request, "unitrader/sell_item.html")
 
 
 def buy_items(request):
     # Get the tag filter from the GET request
-    selected_tag = request.GET.get('tag', '')
+    selected_tag = request.GET.get("tag", "")
 
     # Filter available items based on the selected tag
-    if selected_tag.lower() == 'auction':
-        available_items = Item.objects.filter(status='available', item_tags__iexact='auction')
-    elif selected_tag.lower() == 'lbin':
-        available_items = Item.objects.filter(status='available', item_tags__iexact='lbin')
+    if selected_tag.lower() == "auction":
+        available_items = Item.objects.filter(
+            status="available", item_tags__iexact="auction"
+        )
+    elif selected_tag.lower() == "lbin":
+        available_items = Item.objects.filter(
+            status="available", item_tags__iexact="lbin"
+        )
     else:
-        available_items = Item.objects.filter(status='available')  # No filter applied
+        available_items = Item.objects.filter(status="available")  # No filter applied
 
-    return render(request, 'unitrader/buy_items.html', {
-        'items': available_items,
-        'selected_tag': selected_tag,  # Pass the selected tag to the template
-    })
+    return render(
+        request,
+        "unitrader/buy_items.html",
+        {
+            "items": available_items,
+            "selected_tag": selected_tag,  # Pass the selected tag to the template
+        },
+    )
+
 
 @login_required
 def buy_now(request, item_id):
     print("Buy Now triggered")
     item = get_object_or_404(Item, id=item_id)
 
-    if item.item_tags == 'lbin' and item.status == 'available':
+    if item.item_tags == "lbin" and item.status == "available":
         print(f"Processing purchase for item: {item.item_title}")
-        context = {
-            'item': item
-        }
-        return render(request, 'unitrader/confirm_purchase.html', context)
+        context = {"item": item}
+        return render(request, "unitrader/confirm_purchase.html", context)
 
-    return redirect('buy_items')
-
+    return redirect("buy_items")
 
 
 from django.contrib.auth.decorators import login_required
@@ -162,8 +172,8 @@ from django.shortcuts import get_object_or_404, redirect
 from .models import Item, Profile
 
 
-
 from decimal import Decimal  # Importing Decimal
+
 
 @login_required
 def bid_on_item(request, item_id):
@@ -172,12 +182,11 @@ def bid_on_item(request, item_id):
     profile = request.user.profile
 
     if request.method == "POST":
-        bid_amount = request.POST.get('bid_amount')
+        bid_amount = request.POST.get("bid_amount")
 
         if bid_amount:
             bid_amount = Decimal(bid_amount)  # Convert to Decimal
-            
-            
+
             if profile.coins >= bid_amount:
                 if item.highest_bidder:
                     previous_highest_bidder_profile = item.highest_bidder.profile
@@ -195,10 +204,11 @@ def bid_on_item(request, item_id):
                     Bid.objects.create(user=request.user, item=item, amount=bid_amount)
                     messages.success(request, "Your bid has been placed successfully!")
                 else:
-                    messages.error(request, "You do not have enough coins to place this bid.")
-            
+                    messages.error(
+                        request, "You do not have enough coins to place this bid."
+                    )
 
-    return redirect('buy_items')
+    return redirect("buy_items")
 
 
 def finalize_auctions(request):
@@ -206,7 +216,8 @@ def finalize_auctions(request):
     items = Item.objects.all()
     for item in items:
         item.finalize_auction()
-    return redirect('buy_items')
+    return redirect("buy_items")
+
 
 # views.py
 from django.shortcuts import render, redirect, get_object_or_404
@@ -216,43 +227,48 @@ from .forms import MessageForm
 from django.contrib.auth.models import User
 from django.db.models import Q
 
+
 @login_required
-def chat_with_seller(request, seller_id):  
+def chat_with_seller(request, seller_id):
     seller = get_object_or_404(User, id=seller_id)
-    
+
     # Retrieve messages between the buyer and the seller
     messages = Message.objects.filter(
-        (Q(sender=request.user) & Q(recipient=seller)) |
-        (Q(sender=seller) & Q(recipient=request.user))
-    ).order_by('timestamp')
+        (Q(sender=request.user) & Q(recipient=seller))
+        | (Q(sender=seller) & Q(recipient=request.user))
+    ).order_by("timestamp")
 
     if request.method == "POST":
-        content = request.POST.get('message')
+        content = request.POST.get("message")
         if content:
             Message.objects.create(
-                sender=request.user,
-                recipient=seller,
-                content=content
+                sender=request.user, recipient=seller, content=content
             )
-            return redirect('chat_with_seller', seller_id=seller.id)  # Redirecting to the same view
+            return redirect(
+                "chat_with_seller", seller_id=seller.id
+            )  # Redirecting to the same view
 
-    return render(request, 'unitrader/chat.html', {
-        'seller': seller,
-        'messages': messages
-    })
+    return render(
+        request, "unitrader/chat.html", {"seller": seller, "messages": messages}
+    )
+
 
 def inbox(request):
     # Retrieve all messages for the logged-in user
-    messages = Message.objects.filter(recipient=request.user).order_by('-timestamp')
+    messages = Message.objects.filter(recipient=request.user).order_by("-timestamp")
 
     for message in messages:
         message.is_read = True  # Mark message as read
         message.save()
 
-    return render(request, 'unitrader/inbox.html', {
-        'messages': messages,
-    })
-    
+    return render(
+        request,
+        "unitrader/inbox.html",
+        {
+            "messages": messages,
+        },
+    )
+
 
 @login_required
 def confirm_purchase(request, item_id):
@@ -264,26 +280,29 @@ def confirm_purchase(request, item_id):
         if profile.coins >= item.base_price:
             profile.coins -= item.base_price  # Deduct the item's price
             item.quantity -= 1  # Reduce item quantity
-            
+
             if item.quantity == 0:
-                item.status = 'sold'
-            
+                item.status = "sold"
+
             # Save the updated profiles and items
             profile.save()
             item.save()
-            
-            messages.success(request, "Purchase confirmed! Coins deducted.")
-            return redirect('buy_items')  # Redirect to buy_items or a success page
-        else:
-            messages.error(request, "You do not have enough coins to purchase this item.")
-            return redirect('confirm_purchase', item_id=item_id)
 
-    return render(request, 'unitrader/confirm_purchase.html', {'item': item})
+            messages.success(request, "Purchase confirmed! Coins deducted.")
+            return redirect("buy_items")  # Redirect to buy_items or a success page
+        else:
+            messages.error(
+                request, "You do not have enough coins to purchase this item."
+            )
+            return redirect("confirm_purchase", item_id=item_id)
+
+    return render(request, "unitrader/confirm_purchase.html", {"item": item})
+
 
 @login_required
 def buy_coins(request):
     if request.method == "POST":
-        coins_to_purchase = int(request.POST.get('coins'))
+        coins_to_purchase = int(request.POST.get("coins"))
         cost = coins_to_purchase * 10  # Set your price per coin here
         profile = request.user.profile
 
@@ -294,35 +313,111 @@ def buy_coins(request):
         else:
             messages.error(request, "You do not have enough coins to purchase more.")
 
-    return render(request, 'unitrader/buy_coins.html')
+    return render(request, "unitrader/buy_coins.html")
+
 
 @login_required
 def seller_history(request):
     """Display all items sold and available by the logged-in user, categorized by LBin and Auction."""
-    available_lbin_items = Item.objects.filter(seller=request.user, status='available', item_tags__iexact='lbin')
-    sold_lbin_items = Item.objects.filter(seller=request.user, status='sold', item_tags__iexact='lbin')
+    available_lbin_items = Item.objects.filter(
+        seller=request.user, status="available", item_tags__iexact="lbin"
+    )
+    sold_lbin_items = Item.objects.filter(
+        seller=request.user, status="sold", item_tags__iexact="lbin"
+    )
 
-    available_auction_items = Item.objects.filter(seller=request.user, status='available', item_tags__iexact='auction')
-    sold_auction_items = Item.objects.filter(seller=request.user, status='sold', item_tags__iexact='auction')
+    available_auction_items = Item.objects.filter(
+        seller=request.user, status="available", item_tags__iexact="auction"
+    )
+    sold_auction_items = Item.objects.filter(
+        seller=request.user, status="sold", item_tags__iexact="auction"
+    )
 
     context = {
-        'available_lbin_items': available_lbin_items,
-        'sold_lbin_items': sold_lbin_items,
-        'available_auction_items': available_auction_items,
-        'sold_auction_items': sold_auction_items,
+        "available_lbin_items": available_lbin_items,
+        "sold_lbin_items": sold_lbin_items,
+        "available_auction_items": available_auction_items,
+        "sold_auction_items": sold_auction_items,
     }
-    
-    return render(request, 'unitrader/seller_history.html', context)
+
+    return render(request, "unitrader/seller_history.html", context)
+
 
 @login_required
 def buyer_history(request):
     # Get items where the user was the highest bidder (auction) or bought through LBin
-    bought_auction_items = Item.objects.filter(highest_bidder=request.user, status='sold')
-    bought_lbin_items = Item.objects.filter(seller=request.user, status='sold', highest_bidder=request.user)
+    bought_auction_items = Item.objects.filter(
+        highest_bidder=request.user, status="sold"
+    )
+    bought_lbin_items = Item.objects.filter(
+        seller=request.user, status="sold", highest_bidder=request.user
+    )
 
     context = {
-        'bought_auction_items': bought_auction_items,
-        'bought_lbin_items': bought_lbin_items,
+        "bought_auction_items": bought_auction_items,
+        "bought_lbin_items": bought_lbin_items,
     }
-    
-    return render(request, 'unitrader/buyer_history.html', context)
+
+    return render(request, "unitrader/buyer_history.html", context)
+
+
+# views.py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import Product, Category, Review, Landing, Navigation
+from .serializers import (
+    ProductSerializer,
+    CategorySerializer,
+    ReviewSerializer,
+    LandingSerializer,
+    NavigationSerializer,
+    ProductCreateSerializer,
+)
+from rest_framework import status
+
+
+class ProductListView(APIView):
+    def get(self, request):
+        products = Product.objects.all()
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class CategoryListView(APIView):
+    def get(self, request):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data)
+
+
+class ReviewListView(APIView):
+    def get(self, request):
+        reviews = Review.objects.all()
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+
+class LandingListView(APIView):
+    def get(self, request):
+        landings = Landing.objects.all()
+        serializer = LandingSerializer(landings, many=True)
+        return Response(serializer.data)
+
+
+class NavigationListView(APIView):
+    def get(self, request):
+        navigation_items = Navigation.objects.all()
+        serializer = NavigationSerializer(navigation_items, many=True)
+        return Response(serializer.data)
+
+
+class ProductCreateView(APIView):
+    def post(self, request):
+        serializer = ProductCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            product_data = serializer.validated_data
+            # Assuming you save the product data to a model (Product model)
+            Product.objects.create(**product_data)
+
+            return Response(product_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

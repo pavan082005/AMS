@@ -2,6 +2,7 @@ from django.urls import path
 
 from auctionmanagement import settings
 from . import views
+from .views import ProductListView, CategoryListView, ReviewListView, LandingListView, NavigationListView
 
 urlpatterns = [
     path('', views.home, name='home'),  
@@ -22,4 +23,13 @@ urlpatterns = [
     path('buy_coins/', views.buy_coins, name='buy_coins'),  
     path('seller_history/', views.seller_history, name='seller_history'),
 
+
+    path('api/products/', ProductListView.as_view(), name='product-list'),
+    path('api/categories/', CategoryListView.as_view(), name='category-list'),
+    path('api/reviews/', ReviewListView.as_view(), name='review-list'),
+    path('api/landings/', LandingListView.as_view(), name='landing-list'),
+    path('api/navigation/', NavigationListView.as_view(), name='navigation-list'),
+
 ]
+
+

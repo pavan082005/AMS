@@ -16,11 +16,6 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
-from django.contrib.auth.models import User
-from django.db import models
-from django.utils import timezone
-from datetime import timedelta
-
 class Item(models.Model):
     item_title = models.CharField(max_length=100)
     item_description = models.TextField()
@@ -94,3 +89,80 @@ class Message(models.Model):
 
     def __str__(self):
         return f'Message from {self.sender.username} to {self.recipient.username}'
+    
+
+# Media Model
+class Media(models.Model):
+    name = models.CharField(max_length=255)
+    original_name = models.CharField(max_length=255, null=True, blank=True)
+    size = models.IntegerField(null=True, blank=True)
+    type = models.CharField(max_length=50)
+    url = models.URLField()
+    imgix_url = models.URLField(null=True, blank=True)
+    folder = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField()
+    created_by = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+# Category Model
+class Category(models.Model):
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    image = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+
+# Landing Model
+class Landing(models.Model):
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    hero_image = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True, related_name='landing_hero_image')
+
+    def __str__(self):
+        return self.title
+
+
+# Navigation Model
+class Navigation(models.Model):
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=255)
+    link = models.URLField()
+    order = models.IntegerField()
+
+    def __str__(self):
+        return self.title
+
+
+# Product Model
+class Product(models.Model):
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    image = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_image')
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    count = models.IntegerField()
+    color = models.CharField(max_length=255)
+    category = models.ManyToManyField(Category)
+
+    def __str__(self):
+        return self.title
+
+
+# Review Model
+class Review(models.Model):
+    slug = models.SlugField(unique=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    title = models.CharField(max_length=255)
+    rating = models.IntegerField()
+    content = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f'Review for {self.product.title} - {self.rating} stars'
+
